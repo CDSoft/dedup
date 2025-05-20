@@ -20,29 +20,25 @@ https://cdelord.fr/dedup
 
 version "1.0"
 
-local F = require "F"
-
 local sanitize = false
-
-local cflags = F{
-    "-std=gnu2x",
-    "-O3",
-    "-Wall",
-    "-Wextra",
-    "-Wstrict-prototypes",
-    "-Wmissing-field-initializers",
-    "-Wmissing-prototypes",
-    "-Wmissing-declarations",
-    "-Werror=switch-enum",
-    "-Werror=implicit-fallthrough",
-    "-Werror=missing-prototypes",
-    "-Werror",
-    '-DVERSION="\\"$version\\""',
-}
 
 build.clang
     : add "cflags" {
-        cflags,
+        build.compile_flags {
+            "-std=gnu2x",
+            "-O3",
+            "-Wall",
+            "-Wextra",
+            "-Wstrict-prototypes",
+            "-Wmissing-field-initializers",
+            "-Wmissing-prototypes",
+            "-Wmissing-declarations",
+            "-Werror=switch-enum",
+            "-Werror=implicit-fallthrough",
+            "-Werror=missing-prototypes",
+            "-Werror",
+            '-DVERSION="\\"$version\\""',
+        },
         sanitize and {
             "-Og",
             "-g",
@@ -65,8 +61,6 @@ build.clang
             "-s",
         },
     }
-
-file "compile_flags.txt" { vars%cflags:unlines() }
 
 local dedup = build.clang "$builddir/dedup" { ls "src/*.c" }
 default { dedup }
