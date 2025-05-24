@@ -19,10 +19,10 @@
 
 #include "file_list.h"
 
+#include "fnv1a.h"
 #include "name_list.h"
 #include "options.h"
 #include "path.h"
-#include "sha1.h"
 
 #include <libgen.h>
 #include <stdio.h>
@@ -37,15 +37,13 @@
 #define PARTIAL_CONTENT_SIZE    (4*1024)
 #define READ_BLOCK_SIZE         (4*1024)
 
-#define DIGEST_SIZE             20
-
 typedef struct {
     t_name name;
     size_t device, inode;
     size_t size;
-    unsigned char start_digest[DIGEST_SIZE];
-    unsigned char end_digest[DIGEST_SIZE];
-    unsigned char digest[DIGEST_SIZE];
+    t_hash start_digest;
+    t_hash end_digest;
+    t_hash digest;
     bool start_digest_evaluated;
     bool end_digest_evaluated;
     bool digest_evaluated;
@@ -147,7 +145,7 @@ size_t file_list_scan(const char *path)
     return n;
 }
 
-static const unsigned char *start_digest(t_file_id *file)
+static t_hash start_digest(t_file_id *file)
 {
     if (file->vanished || file->start_digest_evaluated) { goto end; }
     char buf[PARTIAL_CONTENT_SIZE];
@@ -160,16 +158,14 @@ static const unsigned char *start_digest(t_file_id *file)
     }
     const size_t len = fread(buf, 1, sizeof(buf), f);
     fclose(f);
-    SHA1_CTX ctx;
-    SHA1Init(&ctx);
-    SHA1Update(&ctx, (const unsigned char*)buf, len);
-    SHA1Final((unsigned char *)file->start_digest, &ctx);
+    fnv1a_init(&file->start_digest);
+    fnv1a_update(&file->start_digest, (const unsigned char*)buf, len);
     file->start_digest_evaluated = true;
 end:
     return file->start_digest;
 }
 
-static const unsigned char *end_digest(t_file_id *file)
+static t_hash end_digest(t_file_id *file)
 {
     if (file->vanished || file->end_digest_evaluated) { goto end; }
     char buf[PARTIAL_CONTENT_SIZE];
@@ -187,16 +183,14 @@ static const unsigned char *end_digest(t_file_id *file)
     }
     const size_t len = fread(buf, 1, sizeof(buf), f);
     fclose(f);
-    SHA1_CTX ctx;
-    SHA1Init(&ctx);
-    SHA1Update(&ctx, (const unsigned char*)buf, len);
-    SHA1Final((unsigned char *)file->end_digest, &ctx);
+    fnv1a_init(&file->end_digest);
+    fnv1a_update(&file->end_digest, (const unsigned char*)buf, len);
     file->end_digest_evaluated = true;
 end:
     return file->end_digest;
 }
 
-static const unsigned char *digest(t_file_id *file)
+static t_hash digest(t_file_id *file)
 {
     if (file->vanished || file->digest_evaluated) { goto end; }
     char buf[READ_BLOCK_SIZE];
@@ -207,14 +201,12 @@ static const unsigned char *digest(t_file_id *file)
         file->vanished = true;
         goto end;
     }
-    SHA1_CTX ctx;
-    SHA1Init(&ctx);
+    fnv1a_init(&file->digest);
     size_t len;
     while ((len = fread(buf, 1, sizeof(buf), f)) > 0) {
-        SHA1Update(&ctx, (const unsigned char*)buf, len);
+        fnv1a_update(&file->digest, (const unsigned char*)buf, len);
     }
     fclose(f);
-    SHA1Final((unsigned char *)file->digest, &ctx);
     file->digest_evaluated = true;
 end:
     return file->digest;
@@ -238,25 +230,25 @@ static int compare_files(const void *p1, const void *p2)
     }
 
     /* check first bytes */
-    const unsigned char *start_digest_1 = start_digest(f1);
-    const unsigned char *start_digest_2 = start_digest(f2);
-    const int start_digest_order = memcmp(start_digest_1, start_digest_2, DIGEST_SIZE);
+    const t_hash start_digest_1 = start_digest(f1);
+    const t_hash start_digest_2 = start_digest(f2);
+    const int start_digest_order = fnv1a_compare(start_digest_1, start_digest_2);
     if (start_digest_order != 0) { return start_digest_order; }
 
     /* check last bytes */
     if (f1->size > PARTIAL_CONTENT_SIZE) {
-        const unsigned char *end_digest_1 = end_digest(f1);
-        const unsigned char *end_digest_2 = end_digest(f2);
-        const int end_digest_order = memcmp(end_digest_1, end_digest_2, DIGEST_SIZE);
+        const t_hash end_digest_1 = end_digest(f1);
+        const t_hash end_digest_2 = end_digest(f2);
+        const int end_digest_order = fnv1a_compare(end_digest_1, end_digest_2);
         if (end_digest_order != 0) { return end_digest_order; }
     }
 
     /* check complete content */
     if (safe_check()) {
         if (f1->size > 2*PARTIAL_CONTENT_SIZE) {
-            const unsigned char *digest_1 = digest(f1);
-            const unsigned char *digest_2 = digest(f2);
-            const int digest_order = memcmp(digest_1, digest_2, DIGEST_SIZE);
+            const t_hash digest_1 = digest(f1);
+            const t_hash digest_2 = digest(f2);
+            const int digest_order = fnv1a_compare(digest_1, digest_2);
             if (digest_order != 0) { return digest_order; }
         }
     }
@@ -273,25 +265,25 @@ static bool similar_files(t_file_id *f1, t_file_id *f2)
     if (f1->device == f2->device && f1->inode == f2->inode) { return true; }
 
     /* check first bytes */
-    const unsigned char *start_digest_1 = start_digest(f1);
-    const unsigned char *start_digest_2 = start_digest(f2);
-    const int start_digest_order = memcmp(start_digest_1, start_digest_2, DIGEST_SIZE);
+    const t_hash start_digest_1 = start_digest(f1);
+    const t_hash start_digest_2 = start_digest(f2);
+    const int start_digest_order = fnv1a_compare(start_digest_1, start_digest_2);
     if (start_digest_order != 0) { return false; }
 
     /* check last bytes */
     if (f1->size > PARTIAL_CONTENT_SIZE) {
-        const unsigned char *end_digest_1 = end_digest(f1);
-        const unsigned char *end_digest_2 = end_digest(f2);
-        const int end_digest_order = memcmp(end_digest_1, end_digest_2, DIGEST_SIZE);
+        const t_hash end_digest_1 = end_digest(f1);
+        const t_hash end_digest_2 = end_digest(f2);
+        const int end_digest_order = fnv1a_compare(end_digest_1, end_digest_2);
         if (end_digest_order != 0) { return false; }
     }
 
     /* check complete content */
     if (safe_check()) {
         if (f1->size > 2*PARTIAL_CONTENT_SIZE) {
-            const unsigned char *digest_1 = digest(f1);
-            const unsigned char *digest_2 = digest(f2);
-            const int digest_order = memcmp(digest_1, digest_2, DIGEST_SIZE);
+            const t_hash digest_1 = digest(f1);
+            const t_hash digest_2 = digest(f2);
+            const int digest_order = fnv1a_compare(digest_1, digest_2);
             if (digest_order != 0) { return false; }
         }
     }

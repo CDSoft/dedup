@@ -18,7 +18,7 @@ For further information about dedup you can visit
 https://cdelord.fr/dedup
 ]]
 
-version "1.0"
+version "1.1"
 
 local sanitize = false
 
