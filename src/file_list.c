@@ -33,9 +33,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MINIMAL_FILE_SIZE       1024
-#define PARTIAL_CONTENT_SIZE    (4*1024)
-#define READ_BLOCK_SIZE         (4*1024)
+constexpr size_t MINIMAL_FILE_SIZE    = 1024;
+constexpr size_t PARTIAL_CONTENT_SIZE = 4*1024;
+constexpr size_t READ_BLOCK_SIZE      = 4*1024;
 
 typedef struct {
     t_name name;
@@ -96,7 +96,7 @@ static const t_file_id *file_list_new(const char *path, const char *name)
         file_list.length--;
         return NULL;
     }
-    if (st.st_size < MINIMAL_FILE_SIZE) {
+    if (st.st_size < 0 || (size_t)st.st_size < MINIMAL_FILE_SIZE) {
         file_list.length--;
         return NULL;
     }
