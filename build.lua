@@ -18,7 +18,7 @@ For further information about dedup you can visit
 https://cdelord.fr/dedup
 ]]
 
-version "1.1"
+version "1.2"
 
 local sanitize = false
 
@@ -39,6 +39,7 @@ build.clang
             "-Werror",
             '-DVERSION="\\"$version\\""',
         },
+        "-ferror-limit=5",
         sanitize and {
             "-Og",
             "-g",

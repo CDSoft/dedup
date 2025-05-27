@@ -21,10 +21,11 @@
 
 #include <stdlib.h>
 
-typedef unsigned __int128 t_hash;
+constexpr size_t hash_size = 128;
+typedef unsigned _BitInt(hash_size) t_hash;
 
-#define FNV_OFFSET_BASIS ( ((t_hash)0x6c62272e07bb0142ULL << 64) | 0x62b821756295c58dULL )
-#define FNV_PRIME        ( ((t_hash)0x0000000001000000ULL << 64) | 0x000000000000013bULL )
+constexpr t_hash FNV_OFFSET_BASIS = ((t_hash)0x6c62272e07bb0142ULL << 64) | 0x62b821756295c58dULL;
+constexpr t_hash FNV_PRIME        = ((t_hash)0x0000000001000000ULL << 64) | 0x000000000000013bULL;
 
 static inline void fnv1a_init(t_hash *hash)
 {
@@ -40,6 +41,7 @@ static inline void fnv1a_update(t_hash *hash, const unsigned char *data, size_t 
 
 static inline int fnv1a_compare(t_hash hash1, t_hash hash2)
 {
-    __int128 diff = (__int128)hash2 - (__int128)hash1;
-    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    if (hash2 > hash1) { return 1; }
+    if (hash2 < hash1) { return -1; }
+    return 0;
 }
