@@ -73,3 +73,10 @@ bool scan_hidden_files(void);
  * @return true if safe mode is enabled, false otherwise
  */
 bool safe_check(void);
+
+/**
+ * @brief Check if IO statistics shall be printed.
+ *
+ * @return true if statistics shall be printed.
+ */
+bool show_statistics(void);

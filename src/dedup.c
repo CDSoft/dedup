@@ -53,5 +53,6 @@ int main(int argc, const char *argv[])
     options_init(argc, argv);
     file_list_sort();
     file_list_print_similar_files();
+    file_list_statistics();
     return EXIT_SUCCESS;
 }

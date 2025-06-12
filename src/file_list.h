@@ -77,3 +77,10 @@ size_t file_list_size(void);
  * The file list should be populated and sorted before calling this function.
  */
 void file_list_print_similar_files(void);
+
+/**
+ * @brief Show IO statistics
+ *
+ * This function prints IO statistics.
+ */
+void file_list_statistics(void);

@@ -377,3 +377,29 @@ void file_list_print_similar_files(void)
     printf("\n");
     printf("# Lost space: %s\n", size_unit(lost));
 }
+
+static size_t min(size_t a, size_t b)
+{
+    return a <= b ? a : b;
+}
+
+void file_list_statistics(void)
+{
+    if (!show_statistics()) { return; }
+
+    fprintf(stderr, "\n");
+    fprintf(stderr, "# IO statistics\n");
+    size_t total_start_hash = 0;
+    size_t total_end_hash = 0;
+    size_t total_file_hash = 0;
+    for (size_t i = 0; i < file_list.length; i++) {
+        total_start_hash += file_list.files[i].start_digest_evaluated ? min(file_list.files[i].size, PARTIAL_CONTENT_SIZE) : 0;
+        total_end_hash += file_list.files[i].end_digest_evaluated ? min(file_list.files[i].size, PARTIAL_CONTENT_SIZE) : 0;
+        total_file_hash += file_list.files[i].digest_evaluated ? file_list.files[i].size : 0;
+    }
+    fprintf(stderr, "# Files     : %zu\n", file_list.length);
+    fprintf(stderr, "# Start hash: %s\n", size_unit(total_start_hash));
+    fprintf(stderr, "# End   hash: %s\n", size_unit(total_end_hash));
+    fprintf(stderr, "# File  hash: %s\n", size_unit(total_file_hash));
+    fprintf(stderr, "# Total hash: %s\n", size_unit(total_start_hash+total_end_hash+total_file_hash));
+}

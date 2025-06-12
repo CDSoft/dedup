@@ -56,6 +56,9 @@ dedup [options] directories
 `--fast`
 :   Only compare the beginning and the end of files (faster, default option)
 
+`--stats`
+:   Show IO statistics
+
 `--help` or `-h`
 :   Display help and exit
 

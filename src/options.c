@@ -37,6 +37,7 @@ typedef struct {
     bool safe;
     char **ignore_patterns;
     size_t nb_ignore_patterns;
+    bool statistics;
 } t_opts;
 
 t_opts opts = {
@@ -44,6 +45,7 @@ t_opts opts = {
     .safe = false,
     .ignore_patterns = NULL,
     .nb_ignore_patterns = 0,
+    .statistics = false,
 };
 
 static void version(void)
@@ -67,6 +69,7 @@ static void help(void)
         "    --safe          safe file comparisons (all bytes, slower)\n"
         "    --hidden        check hidden (dotted) files\n"
         "    --skip-hidden   ignore hidden files\n"
+        "    --stats         show IO statistics\n"
         "\n"
         "The default options are --skip-hidden and --fast\n"
         "\n"
@@ -116,6 +119,7 @@ void options_init(int argc, const char *argv[])
         if (strcmp(argv[i], "--skip-hidden") == 0) { opts.show_hidden = false; continue; }
         if (strcmp(argv[i], "--fast"       ) == 0) { opts.safe = false; continue; }
         if (strcmp(argv[i], "--safe"       ) == 0) { opts.safe = true; continue; }
+        if (strcmp(argv[i], "--stats"      ) == 0) { opts.statistics = true; continue; }
         char *path = realpath(argv[i], NULL);
         if (path != NULL) {
             const size_t n = file_list_scan(path);
@@ -148,4 +152,9 @@ bool scan_hidden_files(void)
 bool safe_check(void)
 {
     return opts.safe;
+}
+
+bool show_statistics(void)
+{
+    return opts.statistics;
 }
