@@ -33,9 +33,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-constexpr size_t MINIMAL_FILE_SIZE    = 1024;
-constexpr size_t PARTIAL_CONTENT_SIZE = 4*1024;
-constexpr size_t READ_BLOCK_SIZE      = 4*1024;
+#define MINIMAL_FILE_SIZE    1024
+#define PARTIAL_CONTENT_SIZE (4*1024)
+#define READ_BLOCK_SIZE      (4*1024)
 
 typedef struct {
     t_name name;

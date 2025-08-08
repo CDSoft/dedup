@@ -21,11 +21,10 @@
 
 #include <stdlib.h>
 
-constexpr size_t hash_size = 128;
-typedef unsigned _BitInt(hash_size) t_hash;
+typedef __uint128_t t_hash;
 
-constexpr t_hash FNV_OFFSET_BASIS = ((t_hash)0x6c62272e07bb0142ULL << 64) | 0x62b821756295c58dULL;
-constexpr t_hash FNV_PRIME        = ((t_hash)0x0000000001000000ULL << 64) | 0x000000000000013bULL;
+const t_hash FNV_OFFSET_BASIS = ((t_hash)0x6c62272e07bb0142ULL << 64) | 0x62b821756295c58dULL;
+const t_hash FNV_PRIME        = ((t_hash)0x0000000001000000ULL << 64) | 0x000000000000013bULL;
 
 static inline void fnv1a_init(t_hash *hash)
 {

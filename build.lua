@@ -18,14 +18,14 @@ For further information about dedup you can visit
 https://cdelord.fr/dedup
 ]]
 
-version "1.3"
+version "1.3.1"
 
 local sanitize = false
+local compiler = sanitize and build.clang or build.cc
 
-build.clang
+compiler
     : add "cflags" {
         build.compile_flags {
-            "-std=gnu2x",
             "-O3",
             "-Wall",
             "-Wextra",
@@ -39,7 +39,6 @@ build.clang
             "-Werror",
             '-DVERSION="\\"$version\\""',
         },
-        "-ferror-limit=5",
         sanitize and {
             "-Og",
             "-g",
@@ -63,6 +62,6 @@ build.clang
         },
     }
 
-local dedup = build.clang "$builddir/dedup" { ls "src/*.c" }
+local dedup = compiler "$builddir/dedup" { ls "src/*.c" }
 default { dedup }
 install "bin" { dedup }
