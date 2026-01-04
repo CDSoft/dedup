@@ -74,11 +74,8 @@ t_name name_list_new(const char *dir, const char *name);
 char *name_list_get(t_name name);
 
 /**
- * @brief Get the number of entries in the name list
+ * @brief Get the size in bytes of the whole structure in memory
  *
- * This function returns the current number of file names stored in the
- * name list.
- *
- * @return The number of entries in the name list
+ * @return The allocated size in bytes
  */
 size_t name_list_size(void);

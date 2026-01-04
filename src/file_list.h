@@ -61,11 +61,9 @@ size_t file_list_scan(const char *path);
 void file_list_sort(void);
 
 /**
- * @brief Get the number of files in the file list
+ * @brief Get the size in bytes of the whole structure in memory
  *
- * This function returns the current number of files stored in the file list.
- *
- * @return The number of files in the list
+ * @return The allocated size in bytes
  */
 size_t file_list_size(void);
 
