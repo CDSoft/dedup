@@ -121,8 +121,7 @@ size_t file_list_scan(const char *path)
     while ((file = readdir(d)) != NULL) {
         if (file->d_name[0] == '.' && !scan_hidden_files()) { continue; }
         switch (file->d_type) {
-            case DT_DIR:
-            {
+            case DT_DIR: {
                 if (strcmp(file->d_name, ".") == 0) break;
                 if (strcmp(file->d_name, "..") == 0) break;
                 char subdir[strlen(path) + 1 + strlen(file->d_name) + 1];
@@ -130,8 +129,7 @@ size_t file_list_scan(const char *path)
                 n += file_list_scan(subdir);
                 break;
             }
-            case DT_REG:
-            {
+            case DT_REG: {
                 if (file_list_new(path, file->d_name) != NULL) {
                     n++;
                 }
