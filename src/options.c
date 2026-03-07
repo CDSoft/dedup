@@ -109,6 +109,7 @@ static void read_conf(void)
 
 void options_init(int argc, const char *argv[])
 {
+    printf("# Duplicate files\n");
     read_conf();
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help"       ) == 0) { help(); }
