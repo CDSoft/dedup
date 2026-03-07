@@ -307,9 +307,9 @@ static const volatile char *size_unit(size_t size)
         {4,           1024, "Kb"},
         {0,              1, "bytes"},
     };
-    static char out[64];
+    static char out[20];
     out[0] = '\0';
-    for (size_t i = 0; i < 4; i++) {
+    for (size_t i = 0; i < sizeof(units)/sizeof(units[0]); i++) {
         if (size >= units[i].k*units[i].u) {
             snprintf(out, sizeof(out), "%zu %s", size/units[i].u, units[i].name);
             break;
