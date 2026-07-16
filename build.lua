@@ -18,7 +18,7 @@ For further information about dedup you can visit
 https://cdelord.fr/dedup
 ]]
 
-version "1.3.2"
+version "1.3.3"
 
 local sanitize = false
 local compiler = sanitize and build.clang or build.cc

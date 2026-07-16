@@ -107,10 +107,27 @@ static void read_conf(void)
     fclose(f);
 }
 
+static void intro(void)
+{
+    static bool done = false;
+    if (!done) {
+        printf("# Duplicate files\n");
+        read_conf();
+        done = true;
+    }
+}
+
+static void outtro(void)
+{
+    printf("# Memory usage: %lu Mb\n",
+            ( file_list_size()
+            + name_list_size()
+            ) / (1024*1024)
+    );
+}
+
 void options_init(int argc, const char *argv[])
 {
-    printf("# Duplicate files\n");
-    read_conf();
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help"       ) == 0) { help(); }
         if (strcmp(argv[i], "-h"           ) == 0) { help(); }
@@ -121,6 +138,7 @@ void options_init(int argc, const char *argv[])
         if (strcmp(argv[i], "--fast"       ) == 0) { opts.safe = false; continue; }
         if (strcmp(argv[i], "--safe"       ) == 0) { opts.safe = true; continue; }
         if (strcmp(argv[i], "--stats"      ) == 0) { opts.statistics = true; continue; }
+        intro();
         char *path = realpath(argv[i], NULL);
         if (path != NULL) {
             const size_t n = file_list_scan(path);
@@ -128,11 +146,7 @@ void options_init(int argc, const char *argv[])
             free(path);
         }
     }
-    printf("# Memory usage: %lu Mb\n",
-            ( file_list_size()
-            + name_list_size()
-            ) / (1024*1024)
-    );
+    outtro();
 }
 
 bool ignored(const char *path)

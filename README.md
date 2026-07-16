@@ -62,6 +62,9 @@ dedup [options] directories
 `--help` or `-h`
 :   Display help and exit
 
+`--version` or `-v`
+:   Display version and exit
+
 ## How It Works
 
 `dedup` won't modify the file system.
