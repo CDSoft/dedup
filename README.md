@@ -5,44 +5,44 @@
 `dedup` is a tool that searches for duplicate files in a set of directories.
 It helps you easily identify identical files to free up disk space.
 
-# Installation
+## Installation
 
-## Download from Codeberg
+### Download from Codeberg
 
 ``` sh
-$ git clone https://codeberg.org/cdsoft/dedup
-$ cd dedup
+git clone https://codeberg.org/cdsoft/dedup
+cd dedup
 ```
 
-## Compilation and Installation
+### Compilation and Installation
 
 First generate the Ninja build file:
 
 ``` sh
-$ bang
+bang
 ```
 
 Then `dedup` can be installed in `~/.local/bin` with:
 
 ``` sh
-$ ninja install
+ninja install
 ```
 
 Or just compiled in the `.build` directory with:
 
 ``` sh
-$ ninja
+ninja
 ```
 
-# User Guide
+## User Guide
 
-## Basic Syntax
+### Basic Syntax
 
 ```
 dedup [options] directories
 ```
 
-## Available Options
+### Available Options
 
 `--hidden`
 :   Include hidden files (starting with a dot) in the analysis
@@ -65,23 +65,23 @@ dedup [options] directories
 `--version` or `-v`
 :   Display version and exit
 
-## How It Works
+### How It Works
 
 `dedup` won't modify the file system.
 It just prints the list of duplicate files on the standard output (`stdout`).
 Its output can be redirected to a script and modified to, for example, delete some files.
 
-### Usage Example
+#### Usage Example
 
 ```sh
 # Search for duplicates in the Photos directory
-$ dedup ~/Photos > duplicates.sh
+dedup ~/Photos > duplicates.sh
 
 # Edit the script to choose which files to delete
-$ nano duplicates.sh
+nano duplicates.sh
 
 # Run the script to delete the selected files
-$ sh ./duplicates.sh
+sh ./duplicates.sh
 ```
 
 > [!WARNING]
@@ -91,7 +91,7 @@ $ sh ./duplicates.sh
 > **If you uncomment all lines, all files will be deleted.**
 > It's up to you to wisely choose which lines to uncomment!
 
-## Output Format
+### Output Format
 
 The output of `dedup` is organized in blocks of identical files.
 Each block starts with the filename and its size, followed by the list of duplicate files.
@@ -112,7 +112,7 @@ Example output:
 # Lost space: 6.2 Mb
 ```
 
-## Detection Algorithm
+### Detection Algorithm
 
 `dedup` uses several steps to identify duplicate files:
 
@@ -124,14 +124,14 @@ Example output:
 
 This approach optimizes detection speed while maintaining good accuracy.
 
-# Configuration
+## Configuration
 
 The configuration files are in `$HOME/.config/dedup/`.
 
 `$HOME/.config/dedup/dedup.ignore`
 :   Contains one file pattern per line to exclude directories or files from the analysis.
 
-## Format of `dedup.ignore` File
+### Format of `dedup.ignore` File
 
 Each line in the `dedup.ignore` file contains a glob pattern that will be used to exclude files or directories.
 For example:
@@ -144,56 +144,57 @@ node_modules
 
 This configuration will ignore all `.tmp` files, `.git` and `node_modules` directories.
 
-# Common Use Cases
+## Common Use Cases
 
-## Cleaning Up Duplicate Photos
+### Cleaning Up Duplicate Photos
 
 ```sh
 $ dedup --safe ~/Photos > photo_duplicates.sh
 ```
 
-## Analyzing Multiple Directories
+### Analyzing Multiple Directories
 
 ```sh
 $ dedup ~/Documents ~/Downloads ~/Desktop > duplicates.sh
 ```
 
-## Analyzing Hidden Files
+### Analyzing Hidden Files
 
 ```sh
 $ dedup --hidden ~ > hidden_duplicates.sh
 ```
 
-# Tips and Best Practices
+## Tips and Best Practices
 
 1. Use the `--safe` option for important files to avoid false positives
 2. Always create a backup before deleting files
 3. Carefully check the generated script before running it
 4. Consider using hard links instead of deletion to save space while preserving files
 
-# Troubleshooting
+## Troubleshooting
 
 - If `dedup` is slow on large directories, use the `--fast` and `--skip-hidden` options
 - If you encounter access errors, check the permissions of files and directories
 - For very large sets of files, consider analyzing by subdirectories
 
-# License
+## License
 
-    This file is part of dedup.
+```
+This file is part of dedup.
 
-    dedup is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+dedup is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    dedup is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+dedup is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with dedup.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with dedup.  If not, see <https://www.gnu.org/licenses/>.
 
-    For further information about dedup you can visit
-    https://cdelord.fr/dedup
-
+For further information about dedup you can visit
+https://cdelord.fr/dedup
+```
